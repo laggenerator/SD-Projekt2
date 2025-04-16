@@ -79,6 +79,12 @@ void Heap::increase_key(const char* val, int i) {
   decrease_key(val, -i);
 }
 
+void Heap::modify_key(const char* val, int k) {
+  Pair* zmieniany = find(val);
+  if(zmieniany != nullptr)
+    zmieniany->set_key(k);
+}
+
 void Heap::build(DynamicArray& tablica) {
   dane = tablica;
   //od ostatniego nie-liścia do korzenia
