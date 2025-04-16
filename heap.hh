@@ -21,6 +21,7 @@ public:
   //delete
   void decrease_key(const char* val, int i = 1);
   void increase_key(const char* val, int i = 1);
+  void modify_key(const char* val, int k);
   //chyba po wartosciach:
   /*modify-key() – wciąż koszt O(n) (konieczność znalezienia węzła).
 ▶ Możemy dodatkowo przechowywać słownik mapujący indeks na węzeł.

@@ -127,8 +127,8 @@ DynamicArray& DynamicArray::operator=(const DynamicArray& other) {
     //alokowanie
     rozmiar = other.rozmiar;
     pojemnosc = other.pojemnosc;
-    dane = new Pair[pojemnosc];
-            
+    dane = static_cast<Pair*>(malloc(pojemnosc * sizeof(Pair)));
+
     //kopiowanie
     for (std::size_t i = 0; i < rozmiar; ++i) {
       dane[i] = other.dane[i];  // Wykorzystuje operator= klasy Pair

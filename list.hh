@@ -10,9 +10,11 @@ private:
 
 public:
   Node(Pair v, Node* p = nullptr, Node* n = nullptr) : val(v), prev(p), next(n) {} // Konstruktor węzła
-  Pair value() { return val; }
 
+  Pair value() { return val; }
+  
   friend class List;
+  friend class ListStrategy;
 };
 
 // Lista dwukierunkowa
@@ -40,6 +42,8 @@ public:
   size_t get_size() { return size; }
 
   void _show();
+
+  friend class ListStrategy;
 };
 
 #endif
