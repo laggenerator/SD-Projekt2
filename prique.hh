@@ -1,5 +1,5 @@
-#ifndef HEAP_PRIQUE_HH
-#define HEAP_PRIQUE_HH
+#ifndef PRIQUE_HH
+#define PRIQUE_HH
 #include <memory>
 #include "pair.hh"
 #include "heap.hh"
@@ -105,6 +105,128 @@ public:
   };
 
   void _show() override { dane._show(); }
+};
+
+class DescendArrayStrategy : public PriorityQueueStrategy {
+  private:
+    DynamicArray dane;
+
+    // Funkcja do znajdywania miejsca na nową parę
+    size_t znajdzPozycje(int klucz){
+      size_t l = 0;
+      size_t p = dane.size();
+
+      while(l < p){
+        size_t mid = l + (p - l)/2;
+        if(dane.at_position(mid).get_key() >= klucz){
+          l = mid + 1;
+        } else {
+          p = mid;
+        }
+      }
+      return l;
+    }
+
+  public: 
+  void insert(int p, const char* val) override { insert(Pair(p, val)); };
+  void insert(Pair p) override {
+    // Znajdujemy pozycje dla klucza w zbiorze malejącym nie wiem jak to opisac od najwiekszego do najmniejszego
+    size_t poz = znajdzPozycje(p.get_key());
+    dane.push_at(poz, p);
+  }
+
+  Pair extract_max() override {
+    if(dane.size() == 0){
+      throw std::out_of_range("Kolejka jest pusta");
+    }
+    return dane.remove_front(); // Sortujemy dodając, więc największy klucz jest pierwszy ;)
+  }
+
+  Pair find_max() override {
+    if(dane.size() == 0){
+      throw std::out_of_range("Kolejka jest pusta");
+    }
+    return dane.at_position(0); // Analogicznie jak wyżej
+  }
+
+  void modify_key(const char* val, int nowy_klucz) override {
+    size_t i = 0;
+    while(i < dane.size()){
+      if(strcmp(dane[i].get_val(), val) == 0){
+        Pair stary = dane[i];
+        dane.remove_at(i);
+        insert(Pair(nowy_klucz, stary.get_val()));
+        return;
+      }
+      i++;
+    }
+    throw std::out_of_range("Wartość nie została odnaleziona w kolejce");
+  }
+
+  void _show() override {
+    dane._show();
+  }
+};
+
+class AscendArrayStrategy : public PriorityQueueStrategy {
+  private:
+    DynamicArray dane;
+
+    // Funkcja do znajdywania miejsca na nową parę
+    size_t znajdzPozycje(int klucz){
+      size_t l = 0;
+      size_t p = dane.size();
+
+      while(l < p){
+        size_t mid = l + (p - l)/2;
+        if(dane.at_position(mid).get_key() <= klucz){
+          l = mid + 1;
+        } else {
+          p = mid;
+        }
+      }
+      return l;
+    }
+
+  public: 
+  void insert(int p, const char* val) override { insert(Pair(p, val)); };
+  void insert(Pair p) override {
+    // Znajdujemy pozycje dla klucza w zbiorze malejącym nie wiem jak to opisac od najwiekszego do najmniejszego
+    size_t poz = znajdzPozycje(p.get_key());
+    dane.push_at(poz, p);
+  }
+
+  Pair extract_max() override {
+    if(dane.size() == 0){
+      throw std::out_of_range("Kolejka jest pusta");
+    }
+    return dane.remove_front(); // Sortujemy dodając, więc największy klucz jest pierwszy ;)
+  }
+
+  Pair find_max() override {
+    if(dane.size() == 0){
+      throw std::out_of_range("Kolejka jest pusta");
+    }
+    return dane.at_position(0); // Analogicznie jak wyżej
+  }
+
+  void modify_key(const char* val, int nowy_klucz) override {
+    size_t i = 0;
+    while(i < dane.size()){
+      if(strcmp(dane[i].get_val(), val) == 0){
+        Pair stary = dane[i];
+        dane.remove_at(i);
+        insert(Pair(nowy_klucz, stary.get_val()));
+        return;
+      }
+      i++;
+    }
+    throw std::out_of_range("Wartość nie została odnaleziona w kolejce");
+  }
+
+  void _show() override {
+    dane._show();
+  }
 };
 
 class Prique {
