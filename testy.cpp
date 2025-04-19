@@ -7,9 +7,9 @@
 const size_t rozmiar = 50000;
 int min = 60;
 int max = 122;
-const size_t ilesrednia = 10; //z ilu pomiarow liczymy srednia
+const size_t ilesrednia = 1; //z ilu pomiarow liczymy srednia
 const size_t coilelog = 100; //co ile bierzemy probke, dla 50 000 da to 500 próbek
-
+uint16_t nasiona[5] = {2137, 1410, 420, 1918, 966};
 
 auto start = std::chrono::high_resolution_clock::now();
 auto stop = std::chrono::high_resolution_clock::now();
@@ -32,14 +32,15 @@ int insert(){
   std::chrono::nanoseconds pomiarytablicamalejaca[rozmiar/coilelog] {};
   std::chrono::nanoseconds pomiarytablicarosnaca[rozmiar/coilelog] {};
   std::chrono::nanoseconds pomiarykopiec[rozmiar/coilelog] {};
-  generujDane(daneStartowe, rozmiar, 2137, 'A', 'Z');
   for(size_t j=0;j<ilesrednia;j++){
+    generujDane(daneStartowe, rozmiar, nasiona[j], 'A', 'Z');
     Prique lista(std::make_unique<ListStrategy>());
     Prique tablicamalejaca(std::make_unique<DescendArrayStrategy>());
     Prique tablicarosnaca(std::make_unique<AscendArrayStrategy>());
     Prique kopiec(std::make_unique<HeapStrategy>());
-    for(size_t i=0;i<ilesrednia;i++){
+    for(size_t i=0;i<rozmiar;i++){
       if(i%coilelog == 0){
+        // std::cout << "Pozdro: " << i << "\n";
         start = std::chrono::high_resolution_clock::now();
         lista.insert(daneStartowe[i]);
         stop = std::chrono::high_resolution_clock::now();
@@ -68,8 +69,9 @@ int insert(){
       }
     }
   }
+  // std::cout << pomiarylista[0].count() << " " << pomiarylista[1000].count() << "\n";
   for(size_t i=0;i<rozmiar/coilelog;i++){
-    output << i*coilelog << ";" << pomiarylista->count()/ilesrednia << ";" << pomiarytablicamalejaca->count()/ilesrednia << ";" << pomiarytablicarosnaca->count()/ilesrednia << ";" << pomiarykopiec->count()/ilesrednia << "\n";
+    output << i*coilelog << ";" << pomiarylista[i].count()/ilesrednia << ";" << pomiarytablicamalejaca[i].count()/ilesrednia << ";" << pomiarytablicarosnaca[i].count()/ilesrednia << ";" << pomiarykopiec[i].count()/ilesrednia << "\n";
   }
   output.close();
   return 0;
@@ -96,17 +98,17 @@ int extract_max(){
     Prique tablicarosnaca(std::make_unique<AscendArrayStrategy>());
     Prique kopiec(std::make_unique<HeapStrategy>());
     for(size_t i=0;i<rozmiar;i++){
-      lista.insert(daneStartowe[i]);
+      // lista.insert(daneStartowe[i]);
       tablicamalejaca.insert(daneStartowe[i]);
       tablicarosnaca.insert(daneStartowe[i]);
       kopiec.insert(daneStartowe[i]);
     }
     for(size_t i=rozmiar;i>1;--i){
       if(i%coilelog == 0){
-        start = std::chrono::high_resolution_clock::now();
-        lista.extract_max();
-        stop = std::chrono::high_resolution_clock::now();
-        pomiarylista[i/coilelog] += std::chrono::duration_cast<std::chrono::nanoseconds>(stop - start);
+        // start = std::chrono::high_resolution_clock::now();
+        // lista.extract_max();
+        // stop = std::chrono::high_resolution_clock::now();
+        // pomiarylista[i/coilelog] += std::chrono::duration_cast<std::chrono::nanoseconds>(stop - start);
         
         start = std::chrono::high_resolution_clock::now();
         tablicamalejaca.extract_max();
@@ -131,8 +133,8 @@ int extract_max(){
       }
     }
   }
-  for(size_t i=0;i<(rozmiar/coilelog);i++){
-    output << i*coilelog << ";" << pomiarylista->count()/ilesrednia << ";" << pomiarytablicamalejaca->count()/ilesrednia << ";" << pomiarytablicarosnaca->count()/ilesrednia << ";" << pomiarykopiec->count()/ilesrednia << "\n";
+  for(size_t i=0;i<rozmiar/coilelog;i++){
+    output << rozmiar - i*coilelog << ";" << pomiarylista[i].count()/ilesrednia << ";" << pomiarytablicamalejaca[i].count()/ilesrednia << ";" << pomiarytablicarosnaca[i].count()/ilesrednia << ";" << pomiarykopiec[i].count()/ilesrednia << "\n";
   }
   output.close();
   return 0;
