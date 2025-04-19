@@ -13,7 +13,12 @@ public:
     strncpy(val, v, VAL_SIZE-1);
     val[VAL_SIZE-1] = '\0';
   };
+  Pair(const Pair& p) : key(p.key) {
+    strncpy(val, p.val, VAL_SIZE-1);
+    val[VAL_SIZE-1] = '\0';
+  };
   Pair() : key(0) { memset(val, 0, VAL_SIZE); }
+
   
   int get_key() { return key; }
   const char* get_val() { return val; }

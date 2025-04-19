@@ -60,7 +60,7 @@ Pair& Heap::find_max() {
 Pair* Heap::find(const char* val) {
   if(val == nullptr) return nullptr;
   
-  for(int i = 0; i < dane.size(); ++i) {
+  for(size_t i = 0; i < dane.size(); ++i) {
     if (strncmp(dane[i].get_val(), val, VAL_SIZE) == 0) {
       return &dane[i];
     }
