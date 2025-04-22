@@ -7,10 +7,16 @@
 #include <stdint.h>
 #include <sstream>
 
-int insert();
-int extract_max();
-int size();
-int peek();
-int modify_key();
+enum trybTestu {
+  optymistyczny,
+  sredni,
+  pesymistyczny
+};
+
+int insert(trybTestu scenariusz);
+int extract_max(trybTestu scenariusz);
+int size(trybTestu scenariusz);
+int peek(trybTestu scenariusz);
+int modify_key(trybTestu scenariusz);
 
 #endif

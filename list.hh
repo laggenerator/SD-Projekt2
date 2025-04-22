@@ -19,12 +19,12 @@ public:
 
 // Lista dwukierunkowa
 class List {
-private:
+  private:
   size_t size;
   Node* head; // Wskaźnik na początek listy
   Node* tail; // Wskaźnik na koniec listy
   
-public:
+  public:
   List();
   ~List(); 
 
