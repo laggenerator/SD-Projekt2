@@ -23,11 +23,11 @@ void przygotujDane(Pair* dane, size_t rozmiar, uint16_t seed, trybTestu scenariu
   generujDane(dane, rozmiar, seed, 'A', 'Z');
   if(scenariusz == optymistyczny){ // Największy pierwszy
     std::sort(dane, dane + rozmiar, [](Pair& a, Pair& b){
-      return a.get_key() < b.get_key();
+      return a.get_key() >= b.get_key();
     });
   } else if(scenariusz == pesymistyczny){ // Najmniejszy pierwszy
     std::sort(dane, dane + rozmiar, [](Pair& a, Pair& b){
-      return a.get_key() >= b.get_key();
+      return a.get_key() < b.get_key();
     });
   }
   // Średni przypadek zostaje losowy
@@ -41,18 +41,16 @@ int insert(trybTestu scenariusz){
     std::cerr << "Błąd otwierania." << std::endl;
     return 1;
   }
-  output << "n;Lista;Tablica malejąca;Tablica rosnąca;Kopiec\n";
+  output << "n;Lista;Tablica malejąca;Kopiec\n";
   Pair daneStartowe[rozmiar];
   std::chrono::nanoseconds pomiarylista[rozmiar/coilelog] {};
   std::chrono::nanoseconds pomiarytablicamalejaca[rozmiar/coilelog] {};
-  std::chrono::nanoseconds pomiarytablicarosnaca[rozmiar/coilelog] {};
   std::chrono::nanoseconds pomiarykopiec[rozmiar/coilelog] {};
   for(size_t j=0;j<ilesrednia;j++){
     przygotujDane(daneStartowe, rozmiar, nasiona[j], scenariusz);
-
+    std::cout << daneStartowe[0] << ";" << daneStartowe[1] << ";" << daneStartowe[2] <<"\n";
     Prique lista(std::make_unique<ListStrategy>());
     Prique tablicamalejaca(std::make_unique<DescendArrayStrategy>());
-    Prique tablicarosnaca(std::make_unique<AscendArrayStrategy>());
     Prique kopiec(std::make_unique<HeapStrategy>());
 
     for(size_t i=0;i<rozmiar;i++){
@@ -68,11 +66,6 @@ int insert(trybTestu scenariusz){
         pomiarytablicamalejaca[i/coilelog] += std::chrono::duration_cast<std::chrono::nanoseconds>(stop - start);
         
         start = std::chrono::high_resolution_clock::now();
-        tablicarosnaca.insert(daneStartowe[i]);
-        stop = std::chrono::high_resolution_clock::now();
-        pomiarytablicarosnaca[i/coilelog] += std::chrono::duration_cast<std::chrono::nanoseconds>(stop - start);
-        
-        start = std::chrono::high_resolution_clock::now();
         kopiec.insert(daneStartowe[i]);
         stop = std::chrono::high_resolution_clock::now();
         pomiarykopiec[i/coilelog] += std::chrono::duration_cast<std::chrono::nanoseconds>(stop - start);
@@ -80,7 +73,6 @@ int insert(trybTestu scenariusz){
       } else {
         lista.insert(daneStartowe[i]);
         tablicamalejaca.insert(daneStartowe[i]);
-        tablicarosnaca.insert(daneStartowe[i]);
         kopiec.insert(daneStartowe[i]);
       }
     }
@@ -90,7 +82,6 @@ int insert(trybTestu scenariusz){
     output << i*coilelog << ";" 
            << pomiarylista[i].count()/ilesrednia << ";" 
            << pomiarytablicamalejaca[i].count()/ilesrednia << ";" 
-           << pomiarytablicarosnaca[i].count()/ilesrednia << ";" 
            << pomiarykopiec[i].count()/ilesrednia << "\n";
   }
   output.close();
@@ -105,27 +96,25 @@ int extract_max(trybTestu scenariusz){
     std::cerr << "Błąd otwierania." << std::endl;
     return 1;
   }
-  output << "n;Lista;Tablica malejąca;Tablica rosnąca;Kopiec\n";
+  output << "n;Lista;Tablica malejąca;Kopiec\n";
   Pair daneStartowe[rozmiar];
   std::chrono::nanoseconds pomiarylista[rozmiar/coilelog] {};
   std::chrono::nanoseconds pomiarytablicamalejaca[rozmiar/coilelog] {};
-  std::chrono::nanoseconds pomiarytablicarosnaca[rozmiar/coilelog] {};
   std::chrono::nanoseconds pomiarykopiec[rozmiar/coilelog] {};
   
   for(size_t j=0;j<ilesrednia;j++){
-    przygotujDane(daneStartowe, rozmiar, nasiona[j], scenariusz);
+    // przygotujDane(daneStartowe, rozmiar, nasiona[j], scenariusz);
+    generujDane(daneStartowe, rozmiar, nasiona[j], 'A', 'Z');
 
     Prique lista(std::make_unique<ListStrategy>());
     Prique tablicamalejaca(std::make_unique<DescendArrayStrategy>());
-    Prique tablicarosnaca(std::make_unique<AscendArrayStrategy>());
     Prique kopiec(std::make_unique<HeapStrategy>());
     for(size_t i=0;i<rozmiar;i++){
       lista.insert(daneStartowe[i]);
       tablicamalejaca.insert(daneStartowe[i]);
-      tablicarosnaca.insert(daneStartowe[i]);
       kopiec.insert(daneStartowe[i]);
     }
-    for(size_t i=rozmiar;i>1;i--){
+    for(size_t i=rozmiar;i>0;i--){
       if(i%coilelog == 0){
         start = std::chrono::high_resolution_clock::now();
         lista.extract_max();
@@ -138,11 +127,6 @@ int extract_max(trybTestu scenariusz){
         pomiarytablicamalejaca[i/coilelog] += std::chrono::duration_cast<std::chrono::nanoseconds>(stop - start);
         
         start = std::chrono::high_resolution_clock::now();
-        tablicarosnaca.extract_max();
-        stop = std::chrono::high_resolution_clock::now();
-        pomiarytablicarosnaca[i/coilelog] += std::chrono::duration_cast<std::chrono::nanoseconds>(stop - start);
-        
-        start = std::chrono::high_resolution_clock::now();
         kopiec.extract_max();
         stop = std::chrono::high_resolution_clock::now();
         pomiarykopiec[i/coilelog] += std::chrono::duration_cast<std::chrono::nanoseconds>(stop - start);
@@ -150,7 +134,6 @@ int extract_max(trybTestu scenariusz){
       } else {
         lista.extract_max();
         tablicamalejaca.extract_max();
-        tablicarosnaca.extract_max();
         kopiec.extract_max();
       }
     }
@@ -159,7 +142,6 @@ int extract_max(trybTestu scenariusz){
     output << rozmiar - i*coilelog << ";" 
           << pomiarylista[i].count()/ilesrednia << ";" 
           << pomiarytablicamalejaca[i].count()/ilesrednia << ";" 
-          << pomiarytablicarosnaca[i].count()/ilesrednia << ";" 
           << pomiarykopiec[i].count()/ilesrednia << "\n";
   }
   output.close();
@@ -173,19 +155,18 @@ int peek(trybTestu scenariusz){
       std::cerr << "Błąd otwierania pliku." << std::endl;
       return 1;
   }
-  output << "n;Lista;Tablica malejąca;Tablica rosnąca;Kopiec\n";
+  output << "n;Lista;Tablica malejąca;Kopiec\n";
 
   Pair daneStartowe[rozmiar];
   std::chrono::nanoseconds pomiarylista[rozmiar/coilelog] = {};
   std::chrono::nanoseconds pomiarytabmalejaca[rozmiar/coilelog] = {};
-  std::chrono::nanoseconds pomiarytabrosnaca[rozmiar/coilelog] = {};
   std::chrono::nanoseconds pomiarykopiec[rozmiar/coilelog] = {};
   for(size_t j=0;j<ilesrednia;j++){
-    przygotujDane(daneStartowe, rozmiar, nasiona[j], scenariusz);
+    // przygotujDane(daneStartowe, rozmiar, nasiona[j], scenariusz);
+    generujDane(daneStartowe, rozmiar, nasiona[j], 'A', 'Z');
 
     Prique lista(std::make_unique<ListStrategy>());
     Prique tablicamalejaca(std::make_unique<DescendArrayStrategy>());
-    Prique tablicarosnaca(std::make_unique<AscendArrayStrategy>());
     Prique kopiec(std::make_unique<HeapStrategy>());
     for(size_t i=0;i<rozmiar;i++){
       if(i%coilelog == 0){
@@ -201,12 +182,6 @@ int peek(trybTestu scenariusz){
         stop = std::chrono::high_resolution_clock::now();
         pomiarytabmalejaca[i/coilelog] += std::chrono::duration_cast<std::chrono::nanoseconds>(stop - start);
         
-        tablicarosnaca.insert(daneStartowe[i]);
-        start = std::chrono::high_resolution_clock::now();
-        tablicarosnaca.find_max();
-        stop = std::chrono::high_resolution_clock::now();
-        pomiarytabrosnaca[i/coilelog] += std::chrono::duration_cast<std::chrono::nanoseconds>(stop - start);
-        
         kopiec.insert(daneStartowe[i]);
         start = std::chrono::high_resolution_clock::now();
         kopiec.find_max();
@@ -216,7 +191,6 @@ int peek(trybTestu scenariusz){
       } else {
         lista.insert(daneStartowe[i]);
         tablicamalejaca.insert(daneStartowe[i]);
-        tablicarosnaca.insert(daneStartowe[i]);
         kopiec.insert(daneStartowe[i]);
       }
     }
@@ -225,7 +199,6 @@ int peek(trybTestu scenariusz){
     output << i*coilelog << ";" 
           << pomiarylista[i].count()/ilesrednia << ";" 
           << pomiarytabmalejaca[i].count()/ilesrednia << ";" 
-          << pomiarytabrosnaca[i].count()/ilesrednia << ";" 
           << pomiarykopiec[i].count()/ilesrednia << "\n";
   }
   output.close();
@@ -240,19 +213,17 @@ int size(trybTestu scenariusz){
       std::cerr << "Błąd otwierania pliku." << std::endl;
       return 1;
   }
-  output << "n;Lista;Tablica malejąca;Tablica rosnąca;Kopiec\n";
+  output << "n;Lista;Tablica malejąca;Kopiec\n";
 
   Pair daneStartowe[rozmiar];
   std::chrono::nanoseconds pomiarylista[rozmiar/coilelog] = {};
   std::chrono::nanoseconds pomiarytabmalejaca[rozmiar/coilelog] = {};
-  std::chrono::nanoseconds pomiarytabrosnaca[rozmiar/coilelog] = {};
   std::chrono::nanoseconds pomiarykopiec[rozmiar/coilelog] = {};
   for(size_t j=0;j<ilesrednia;j++){
     przygotujDane(daneStartowe, rozmiar, nasiona[j], scenariusz);
 
     Prique lista(std::make_unique<ListStrategy>());
     Prique tablicamalejaca(std::make_unique<DescendArrayStrategy>());
-    Prique tablicarosnaca(std::make_unique<AscendArrayStrategy>());
     Prique kopiec(std::make_unique<HeapStrategy>());
     for(size_t i=0;i<rozmiar;i++){
       if(i%coilelog == 0){
@@ -268,12 +239,6 @@ int size(trybTestu scenariusz){
         stop = std::chrono::high_resolution_clock::now();
         pomiarytabmalejaca[i/coilelog] += std::chrono::duration_cast<std::chrono::nanoseconds>(stop - start);
         
-        tablicarosnaca.insert(daneStartowe[i]);
-        start = std::chrono::high_resolution_clock::now();
-        tablicarosnaca.size();
-        stop = std::chrono::high_resolution_clock::now();
-        pomiarytabrosnaca[i/coilelog] += std::chrono::duration_cast<std::chrono::nanoseconds>(stop - start);
-        
         kopiec.insert(daneStartowe[i]);
         start = std::chrono::high_resolution_clock::now();
         kopiec.size();
@@ -283,7 +248,6 @@ int size(trybTestu scenariusz){
       } else {
         lista.insert(daneStartowe[i]);
         tablicamalejaca.insert(daneStartowe[i]);
-        tablicarosnaca.insert(daneStartowe[i]);
         kopiec.insert(daneStartowe[i]);
       }
     }
@@ -292,7 +256,6 @@ int size(trybTestu scenariusz){
     output << i*coilelog << ";" 
           << pomiarylista[i].count()/ilesrednia << ";" 
           << pomiarytabmalejaca[i].count()/ilesrednia << ";" 
-          << pomiarytabrosnaca[i].count()/ilesrednia << ";" 
           << pomiarykopiec[i].count()/ilesrednia << "\n";
   }
   output.close();
@@ -306,25 +269,22 @@ int modify_key(trybTestu scenariusz){
       std::cerr << "Błąd otwierania pliku." << std::endl;
       return 1;
   }
-  output << "n;Lista;Tablica malejąca;Tablica rosnąca;Kopiec\n";
+  output << "n;Lista;Tablica malejąca;Kopiec\n";
 
   Pair daneStartowe[rozmiar];
   Pair daneModyfikacyjneSredniCase[rozmiar];
   std::chrono::nanoseconds pomiarylista[rozmiar/coilelog] = {};
   std::chrono::nanoseconds pomiarytabmalejaca[rozmiar/coilelog] = {};
-  std::chrono::nanoseconds pomiarytabrosnaca[rozmiar/coilelog] = {};
   std::chrono::nanoseconds pomiarykopiec[rozmiar/coilelog] = {};
   for(int j=0;j<ilesrednia;j++){
     przygotujDane(daneStartowe, rozmiar, nasiona[j], scenariusz);
     Prique lista(std::make_unique<ListStrategy>());
     Prique tabmalejaca(std::make_unique<DescendArrayStrategy>());
-    Prique tabrosnaca(std::make_unique<AscendArrayStrategy>());
     Prique kopiec(std::make_unique<HeapStrategy>());
 
     for (size_t i = 0; i < rozmiar; ++i) {
         lista.insert(daneStartowe[i]);
         tabmalejaca.insert(daneStartowe[i]);
-        tabrosnaca.insert(daneStartowe[i]);
         kopiec.insert(daneStartowe[i]);
     }
     int modyfikacje[rozmiar];
@@ -359,14 +319,7 @@ int modify_key(trybTestu scenariusz){
         tabmalejaca.modify_key(val, nowy_klucz);
         stop = std::chrono::high_resolution_clock::now();
         pomiarytabmalejaca[i/coilelog] += std::chrono::duration_cast<std::chrono::nanoseconds>(stop - start);
-        
-        
-        start = std::chrono::high_resolution_clock::now();
-        tabrosnaca.modify_key(val, nowy_klucz);
-        stop = std::chrono::high_resolution_clock::now();
-        pomiarytabrosnaca[i/coilelog] += std::chrono::duration_cast<std::chrono::nanoseconds>(stop - start);
-        
-        
+              
         start = std::chrono::high_resolution_clock::now();
         kopiec.modify_key(val, nowy_klucz);
         stop = std::chrono::high_resolution_clock::now();
@@ -375,7 +328,6 @@ int modify_key(trybTestu scenariusz){
       } else {
         lista.modify_key(val, nowy_klucz);
         tabmalejaca.modify_key(val, nowy_klucz);
-        tabrosnaca.modify_key(val, nowy_klucz);
         kopiec.modify_key(val, nowy_klucz);
       }
     }
@@ -384,7 +336,6 @@ int modify_key(trybTestu scenariusz){
     output << i*coilelog << ";" 
           << pomiarylista[i].count()/ilesrednia << ";" 
           << pomiarytabmalejaca[i].count()/ilesrednia << ";" 
-          << pomiarytabrosnaca[i].count()/ilesrednia << ";" 
           << pomiarykopiec[i].count()/ilesrednia << "\n";
   }
   output.close();

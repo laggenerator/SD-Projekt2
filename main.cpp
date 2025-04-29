@@ -7,18 +7,6 @@
 #include "testy.hh"
 
 
-// int main(){
-//   Prique lista(std::make_unique<ListStrategy>());
-//   for(size_t i=0;i<10;i++){
-//     lista.insert(i, "test");
-//   }
-//   for(size_t i=10;i>0;i++){
-//     lista.extract_max();
-//   }
-//   return 0;
-//   // ROZPIERDALA SIE COS ZOBACZ LISTE inne dzialaja
-// }
-
 int main(int argc, char* argv[]){
   if(argc != 3){
     std::cout << "Wszystkie testy [0] |\nInsert() [1]| Extract_max() [2] | Peek() [3] |\nSize() [4] | Modify_key() [5]\n";
