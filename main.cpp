@@ -1,59 +1,90 @@
 #include <iostream>
-#include "heap.hh"
-#include "list.hh"
-#include "dynamic_array.hh"
+#include <algorithm>
+#include <fstream>
 #include "prique.hh"
-#include "generator.hh"
 #include "testy.hh"
 
+#define N_TESTU 1000 //od 0 do 999 elementow : )
 
-int main(int argc, char* argv[]){
-  if(argc != 3){
-    std::cout << "Wszystkie testy [0] |\nInsert() [1]| Extract_max() [2] | Peek() [3] |\nSize() [4] | Modify_key() [5]\n";
-    std::cout << "Optymistyczny [0] | Sredni [1] | Pesymistyczny [2]\n";
-    return 1;
+void zapisz(const char* nazwa_pliku, double dane[3][N_TESTU]) {
+  //zapis do pliku
+  std::ofstream plik;
+  plik.open(nazwa_pliku, std::ios::out | std::ios::trunc);
+  if (!plik.is_open()) {
+    std::cerr << "Nie można otworzyć pliku: " << nazwa_pliku << std::endl;
   }
-  int test = std::stoi(argv[1]);
-  int scen = std::stoi(argv[2]);
-  if(test < 0 || test > 5){
-    std::cerr << "Niewłaściwa wartość testu\n";
-    return 1;
+  plik << "rozmiar;kopiec;lista;tablica" << std::endl;
+  
+  //ogolnie pierwsza kolumna to po prostu i, ale np w usuwaniu to musi byc i+1, w insert juz i
+  for(size_t i = 0; i < N_TESTU; ++i) {
+    plik << i;
+    for(size_t j = 0; j < 3; ++j) {
+      plik << ";" << dane[j][i];
+    }
+    plik << std::endl;
   }
-  if(scen < 0 || scen > 2){
-    std::cerr << "Niewłaściwa wartość scenariusza";
-    return 1;
-  }
-  trybTestu scenariusz;
+  plik.close();
+}
 
-  switch (scen)
-  {
+std::unique_ptr<PriorityQueueStrategy> strategia(int i) {
+  switch(i) {
   case 0:
-    scenariusz = optymistyczny;
+    return std::make_unique<HeapStrategy>();
     break;
   case 1:
-    scenariusz = sredni;
+    return std::make_unique<ListStrategy>();
     break;
   case 2:
-    scenariusz = pesymistyczny;
-    break;
-  default:
-    scenariusz = sredni;
-    break;
+    return std::make_unique<DescendArrayStrategy>();
   }
-  int (*funkcje[])(trybTestu) = {
-    insert, extract_max, peek , size, modify_key
-  };
+  return nullptr; // lepiej wyjatek aleee juz tak niech bedzie
+}
 
-  
-  if(test == 0){
-    for(int i=0;i<2;i++){
-      funkcje[i](scenariusz);
-      std::cout << i+1 << "/" << 5 << std::endl;
-    }
-    std::cout << "Sukces!\n";
-  } else {
-    funkcje[test-1](scenariusz);
-    std::cout << "Sukces!\n";
+int main() {
+  //testy insert
+  int ziarno = 2010370;
+  Pair dane[N_TESTU];
+  double AVG[3][N_TESTU]; //heap, list, array
+  double OPT[3][N_TESTU]; //heap, list, array
+  double PES[3][N_TESTU]; //heap, list, array
+
+  //testy insert
+  // pesymistyczny dla listy, tablicy to dodawanie ciagle najmniejszego -- daje na koniec sam (dane posortowane od najw. do najm.)
+  // pesymistyczny dla kopca to dodawania ciagle najwiekszego -- musi caaaaaaly kopiec przekopac (dane posortowane od najm. do najw.)
+  // optymistyczne z kolei na odwrot
+  for(int i = 0; i < 3; ++i) {
+    generujDane(dane, N_TESTU, ziarno, 'a', 'z');
+    test_insert(strategia(i), dane, insertAVG[i], N_TESTU);
+    
+    std::sort(dane, dane+N_TESTU, [](Pair a, Pair b) { return a > b; }); //od najw do najm
+    test_insert(strategia(i), dane, (i == 0 ? insertOPT[i] : insertPES[i]), N_TESTU);
+    
+    std::sort(dane, dane+N_TESTU, [](Pair a, Pair b) { return a < b; }); //od najm do najw
+    test_insert(strategia(i), dane, (i == 0 ? insertPES[i] : insertOPT[i]), N_TESTU);
   }
+
+  zapisz("pomiary/insert_srednie.csv", insertAVG);
+  zapisz("pomiary/insert_optymistyczne.csv", insertOPT);
+  zapisz("pomiary/insert_pesymistyczne.csv", insertPES);
+
+
+  //testy sciagania (extract_max)
+  // pesymistycznie
+  // pesymistycznie
+  // pesymistycznie
+  for(int i = 0; i < 3; ++i) {
+    generujDane(dane, N_TESTU, ziarno, 'a', 'z');
+    test_insert(strategia(i), dane, insertAVG[i], N_TESTU);
+    
+    std::sort(dane, dane+N_TESTU, [](Pair a, Pair b) { return a > b; }); //od najw do najm
+    test_insert(strategia(i), dane, (i == 0 ? insertOPT[i] : insertPES[i]), N_TESTU);
+    
+    std::sort(dane, dane+N_TESTU, [](Pair a, Pair b) { return a < b; }); //od najm do najw
+    test_insert(strategia(i), dane, (i == 0 ? insertPES[i] : insertOPT[i]), N_TESTU);
+  }
+
+  zapisz("pomiary/insert_srednie.csv", insertAVG);
+  zapisz("pomiary/insert_optymistyczne.csv", insertOPT);
+  zapisz("pomiary/insert_pesymistyczne.csv", insertPES);
   return 0;
 }
