@@ -65,11 +65,17 @@ public:
 	dane.push_front(p);
       }
       else {
-	Node* nowy = new Node(p, iter->prev, iter); 
-	Node* temp = iter;
-	iter = nowy;
-	temp->prev = iter;
-	iter->prev->next = iter;
+        Node* nowy = new Node(p, iter->prev, iter);
+
+	if (iter->prev)
+	  iter->prev->next = nowy;
+	iter->prev = nowy;
+
+	// Jeśli iter był headem, aktualizujemy head:
+	if (iter == dane.head)
+	  dane.head = nowy;
+
+	dane.size++;
       }
     }
   };
@@ -242,7 +248,7 @@ class AscendArrayStrategy : public PriorityQueueStrategy {
 class Prique {
   std::unique_ptr<PriorityQueueStrategy> strategy; //wskaznik na klase bazowa zeby kazda dziedziczaca mogla byc
 public:
-  Prique(std::unique_ptr<PriorityQueueStrategy> s) : strategy(std::move(s)) {}
+  Prique(std::unique_ptr<PriorityQueueStrategy>& s) : strategy(std::move(s)) {}
 
   void insert(int p, const char* val) { strategy->insert(Pair(p, val)); };
   void insert(Pair p) { strategy->insert(p); };

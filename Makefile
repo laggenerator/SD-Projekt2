@@ -3,8 +3,8 @@ CXXFLAGS = -Wall -Wextra -pedantic -std=c++17 -O0
 
 TARGET = egzek
 
-SRCS = main.cpp dynamic_array.cpp list.cpp heap.cpp generator.cpp testy.cpp
-HEADERS = dynamic_array.hh list.hh heap.hh pair.hh prique.hh generator.hh testy.hh
+SRCS = main.cpp dynamic_array.cpp list.cpp heap.cpp
+HEADERS = dynamic_array.hh list.hh heap.hh pair.hh prique.hh testy.hh
 
 all: $(TARGET)
 
