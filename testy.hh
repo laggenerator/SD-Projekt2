@@ -32,7 +32,7 @@ void test_insert(std::unique_ptr<PriorityQueueStrategy> st, Pair* dane, double* 
       auto start = std::chrono::high_resolution_clock::now();
       kolejka.insert(dane[i]); 
       auto end = std::chrono::high_resolution_clock::now();
-      std::chrono::duration<double, std::milli> czas = end - start;
+      std::chrono::duration<double, std::micro> czas = end - start;
       czasy[i] += czas.count();
     }
     for(size_t i = 0; i < roz; ++i) { //posprzatanie całej
@@ -56,7 +56,7 @@ void test_extract(std::unique_ptr<PriorityQueueStrategy> st, Pair* dane, double*
       auto start = std::chrono::high_resolution_clock::now();
       kolejka.extract_max();
       auto end = std::chrono::high_resolution_clock::now();
-      std::chrono::duration<double, std::milli> czas = end - start;
+      std::chrono::duration<double, std::micro> czas = end - start;
       czasy[i] += czas.count();
     }
   }
@@ -76,7 +76,7 @@ void test_find_max(std::unique_ptr<PriorityQueueStrategy> st, Pair* dane, double
       auto start = std::chrono::high_resolution_clock::now();
       kolejka.find_max();
       auto end = std::chrono::high_resolution_clock::now();
-      std::chrono::duration<double, std::milli> czas = end - start;
+      std::chrono::duration<double, std::micro> czas = end - start;
       czasy[i] += czas.count();
     }
   }

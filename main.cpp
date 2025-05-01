@@ -4,7 +4,7 @@
 #include "prique.hh"
 #include "testy.hh"
 
-#define N_TESTU 1000 //od 0 do 999 elementow : )
+#define N_TESTU 1000 //od 0 do 999 elementow : ) - potem sie zrobi to do 50 kafli imo znowu
 
 void zapisz(const char* nazwa_pliku, double dane[3][N_TESTU]) {
   //zapis do pliku
@@ -44,9 +44,15 @@ int main() {
   //testy insert
   int ziarno = 2010370;
   Pair dane[N_TESTU];
-  double AVG[3][N_TESTU]; //heap, list, array
-  double OPT[3][N_TESTU]; //heap, list, array
-  double PES[3][N_TESTU]; //heap, list, array
+  double insertAVG[3][N_TESTU]; //heap, list, array
+  double insertOPT[3][N_TESTU]; //heap, list, array
+  double insertPES[3][N_TESTU]; //heap, list, array
+
+
+  double extractAVG[3][N_TESTU]; //heap, list, array
+  double extractOPT[3][N_TESTU]; //heap, list, array
+  double extractPES[3][N_TESTU]; //heap, list, array
+
 
   //testy insert
   // pesymistyczny dla listy, tablicy to dodawanie ciagle najmniejszego -- daje na koniec sam (dane posortowane od najw. do najm.)
@@ -74,17 +80,17 @@ int main() {
   // pesymistycznie
   for(int i = 0; i < 3; ++i) {
     generujDane(dane, N_TESTU, ziarno, 'a', 'z');
-    test_insert(strategia(i), dane, insertAVG[i], N_TESTU);
+    test_insert(strategia(i), dane, extractAVG[i], N_TESTU);
     
     std::sort(dane, dane+N_TESTU, [](Pair a, Pair b) { return a > b; }); //od najw do najm
-    test_insert(strategia(i), dane, (i == 0 ? insertOPT[i] : insertPES[i]), N_TESTU);
+    test_insert(strategia(i), dane, (i == 0 ? extractOPT[i] : extractPES[i]), N_TESTU);
     
     std::sort(dane, dane+N_TESTU, [](Pair a, Pair b) { return a < b; }); //od najm do najw
-    test_insert(strategia(i), dane, (i == 0 ? insertPES[i] : insertOPT[i]), N_TESTU);
+    test_insert(strategia(i), dane, (i == 0 ? extractPES[i] : extractOPT[i]), N_TESTU);
   }
 
-  zapisz("pomiary/insert_srednie.csv", insertAVG);
-  zapisz("pomiary/insert_optymistyczne.csv", insertOPT);
-  zapisz("pomiary/insert_pesymistyczne.csv", insertPES);
+  zapisz("pomiary/extract_srednie.csv", extractAVG);
+  zapisz("pomiary/extract_optymistyczne.csv", extractOPT);
+  zapisz("pomiary/extract_pesymistyczne.csv", extractPES);
   return 0;
 }
