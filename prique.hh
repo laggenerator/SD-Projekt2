@@ -161,8 +161,8 @@ class DescendArrayStrategy : public PriorityQueueStrategy {
   void modify_key(const char* val, int nowy_klucz) override {
     size_t i = 0;
     while(i < dane.size()){
-      if(strcmp(dane[i].get_val(), val) == 0){
-        Pair stary = dane[i];
+      if(strcmp(dane[i].get_val(), val) == 0) {
+	Pair stary = dane[i];
         dane.remove_at(i);
         insert(Pair(nowy_klucz, stary.get_val()));
         return;
