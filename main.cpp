@@ -4,7 +4,7 @@
 #include "prique.hh"
 #include "testy.hh"
 
-#define N_TESTU 1000 //od 0 do 999 elementow : )
+#define N_TESTU 50000 //od 0 do 999 elementow : )
 
 void zapisz(const char* nazwa_pliku, double dane[3][N_TESTU]) {
   //zapis do pliku
@@ -54,37 +54,49 @@ int main() {
   // optymistyczne z kolei na odwrot
   for(int i = 0; i < 3; ++i) {
     generujDane(dane, N_TESTU, ziarno, 'a', 'z');
-    test_insert(strategia(i), dane, insertAVG[i], N_TESTU);
+    test_insert(strategia(i), dane, AVG[i], N_TESTU);
     
     std::sort(dane, dane+N_TESTU, [](Pair a, Pair b) { return a > b; }); //od najw do najm
-    test_insert(strategia(i), dane, (i == 0 ? insertOPT[i] : insertPES[i]), N_TESTU);
+    test_insert(strategia(i), dane, (i == 0 ? OPT[i] : PES[i]), N_TESTU);
     
     std::sort(dane, dane+N_TESTU, [](Pair a, Pair b) { return a < b; }); //od najm do najw
-    test_insert(strategia(i), dane, (i == 0 ? insertPES[i] : insertOPT[i]), N_TESTU);
+    test_insert(strategia(i), dane, (i == 0 ? PES[i] : OPT[i]), N_TESTU);
   }
 
-  zapisz("pomiary/insert_srednie.csv", insertAVG);
-  zapisz("pomiary/insert_optymistyczne.csv", insertOPT);
-  zapisz("pomiary/insert_pesymistyczne.csv", insertPES);
+  zapisz("pomiary/insert_srednie.csv", AVG);
+  zapisz("pomiary/insert_optymistyczne.csv", OPT);
+  zapisz("pomiary/insert_pesymistyczne.csv", PES);
 
 
   //testy sciagania (extract_max)
-  // pesymistycznie
-  // pesymistycznie
-  // pesymistycznie
+  // pesymistycznie ani optymistycznie dla listy i tablicy sie nie da, bo i tak zawsze element sciagany jest pierwszy O(1)
+  // pesymistycznie dla kopca oznacza tyle, że jak juz ostatni da na pierwszy i usunie ostatni to wtedy musi ten ostatni na sam
+  // koniec przepchac, optymistycznie to musi jak najmniej przepchac
+
+  //ogolnie nie wiem czy zrobimy bo ciezka sprawa i chyba bez sensu nawet to robic lol
   for(int i = 0; i < 3; ++i) {
     generujDane(dane, N_TESTU, ziarno, 'a', 'z');
-    test_insert(strategia(i), dane, insertAVG[i], N_TESTU);
-    
-    std::sort(dane, dane+N_TESTU, [](Pair a, Pair b) { return a > b; }); //od najw do najm
-    test_insert(strategia(i), dane, (i == 0 ? insertOPT[i] : insertPES[i]), N_TESTU);
-    
-    std::sort(dane, dane+N_TESTU, [](Pair a, Pair b) { return a < b; }); //od najm do najw
-    test_insert(strategia(i), dane, (i == 0 ? insertPES[i] : insertOPT[i]), N_TESTU);
+    test_extract(strategia(i), dane, AVG[i], N_TESTU);
   }
 
-  zapisz("pomiary/insert_srednie.csv", insertAVG);
-  zapisz("pomiary/insert_optymistyczne.csv", insertOPT);
-  zapisz("pomiary/insert_pesymistyczne.csv", insertPES);
+  zapisz("pomiary/extract_srednie.csv", AVG);
+
+  //testy podgladania :~ D, find_max
+  // wszystko w czasie O(1), zawsze
+  for(int i = 0; i < 3; ++i) {
+    generujDane(dane, N_TESTU, ziarno, 'a', 'z');
+    test_find_max(strategia(i), dane, AVG[i], N_TESTU);
+  }
+
+  zapisz("pomiary/find_max_srednie.csv", AVG);
+
+   //testy modyfikacji, modify_key
+  // 
+  for(int i = 0; i < 3; ++i) {
+    generujDane(dane, N_TESTU, ziarno, 'a', 'z');
+    test_find_max(strategia(i), dane, AVG[i], N_TESTU);
+  }
+
+  zapisz("pomiary/find_max_srednie.csv", AVG);
   return 0;
 }
