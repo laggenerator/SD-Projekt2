@@ -5,8 +5,8 @@
 #include "prique.hh"
 #include "testy.hh"
 
-#define N_TESTU 10000 //od 0 do 9999 elementow
-#define N_ZAPIS 25 //co ile zapisywac do pliku
+#define N_TESTU 50000 //od 0 do 9999 elementow
+#define N_ZAPIS 50 //co ile zapisywac do pliku
 
 void zapisz(const char* nazwa_pliku, double dane[3][N_TESTU]) {
   //zapis do pliku

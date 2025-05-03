@@ -40,8 +40,6 @@ void Heap::heapify_down(size_t i) {
 void Heap::insert(Pair val) {
   dane.push_back(val);
   heapify_up(dane.size()-1);
-  if(val.get_key() > max) max = val.get_key();
-  if(val.get_key() < min) min = val.get_key();
 }
 
 Pair Heap::extract_max() {
@@ -49,7 +47,7 @@ Pair Heap::extract_max() {
   dane[0] = dane[dane.size()-1];
   dane[dane.size()-1] = rezultat;
   dane.remove_back();
-  if((dane.size() > 0) || (max - min) != 0)
+  if(dane.size() > 0)
     heapify_down(0);
 
   return rezultat;
