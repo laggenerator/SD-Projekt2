@@ -7,6 +7,7 @@
 class Heap {
 private:
   DynamicArray dane;
+  int max, min;
   void heapify_up(size_t i);
   void heapify_down(size_t i);
 public:

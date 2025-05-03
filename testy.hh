@@ -71,6 +71,29 @@ void test_extract(std::unique_ptr<PriorityQueueStrategy> st, Pair* dane, double*
   }
 }
 
+// Testuje czy optymistyczny kopiec ma sens
+void test_wesolego_kopca(std::unique_ptr<PriorityQueueStrategy> st, double* czasy, const size_t roz) {
+  for (size_t i = 0; i < roz; ++i)
+    czasy[i] = 0.0;
+  
+  Prique kolejka(st);
+  for(size_t s = 0; s < SREDNIA; ++s) { //zdaje sobie sprawe ze uzycie s, nie j ani k to troche cursed ale tak jak srednia : c
+    for(size_t i = 0; i < roz; ++i) { //dodajemy wszystkie roz elementow
+      kolejka.insert(2137, "testy"); 
+    }
+    for(size_t i = 0; i < roz; ++i) {
+      auto start = std::chrono::high_resolution_clock::now();
+      kolejka.extract_max();
+      auto end = std::chrono::high_resolution_clock::now();
+      std::chrono::duration<double, std::micro> czas = end - start;
+      czasy[roz-(i+1)] += czas.count(); //zapisuje na dobrej pozycji w tabeli (bo pelna kolejke oprozniamy)
+    }
+  }
+  for(size_t i = 0; i < roz; ++i) {
+    czasy[i] /= SREDNIA;
+  }
+}
+
 //analogicznie
 void test_find_max(std::unique_ptr<PriorityQueueStrategy> st, Pair* dane, double* czasy, const size_t roz) {
   for (size_t i = 0; i < roz; ++i)
@@ -95,7 +118,7 @@ void test_find_max(std::unique_ptr<PriorityQueueStrategy> st, Pair* dane, double
   }
 }
 
-//potrzebne do testow modiyfy_key
+//potrzebne do testow modify_key
 //przypisuje unikalny lancuch znakow do inta w zakresie
 const std::string CHARSET = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 const int BASE = CHARSET.size();

@@ -1,8 +1,3 @@
-/* WAŻNE
-   1) ogarniecie tablicy bo od tego zalezy np co bierzemy w pes/opt testach
-
- */
-
 #include <iostream>
 #include <algorithm>
 #include <fstream>
@@ -10,8 +5,8 @@
 #include "prique.hh"
 #include "testy.hh"
 
-#define N_TESTU 5000 //od 0 do 999 elementow : ) - potem sie zrobi to do 50 kafli imo znowu
-#define N_ZAPIS 50 //co ile zapisywac do pliku
+#define N_TESTU 10000 //od 0 do 9999 elementow
+#define N_ZAPIS 25 //co ile zapisywac do pliku
 
 void zapisz(const char* nazwa_pliku, double dane[3][N_TESTU]) {
   //zapis do pliku
@@ -53,7 +48,7 @@ int main() {
   double AVG[3][N_TESTU]; //heap, list, array
   double OPT[3][N_TESTU]; //heap, list, array
   double PES[3][N_TESTU]; //heap, list, array
-  
+
   //testy insert
   // pesymistyczny dla listy to dodawanie ciagle najmniejszego -- daje na koniec sam (dane posortowane od najw. do najm.)
   // dla tablicy pesymistyczny to jak musi dodać na początek, bo przenosi wszystko (czyli dane posortowane od najm. do najw) 
@@ -79,12 +74,23 @@ int main() {
   // koniec przepchac, optymistycznie to musi jak najmniej przepchac
 
   //ogolnie nie wiem czy zrobimy bo ciezka sprawa i chyba bez sensu nawet to robic lol
+  // Nie ma jak bo zawsze bedzie cos do naprawienia i wyjdzie logn
   for(int i = 0; i < 3; ++i) {
     generujDane(dane, N_TESTU, ziarno, 'a', 'z');
     test_extract(strategia(i), dane, AVG[i], N_TESTU);
+    if(i==0){
+      test_wesolego_kopca(strategia(i), OPT[i], N_TESTU);
+    } 
+    // else {
+    //   for(int j=0;i<N_TESTU;i++){
+    //     OPT[i][j] = 0;
+    //   }
+    // }
+
   }
 
   zapisz("pomiary/extract_srednie.csv", AVG);
+  zapisz("pomiary/extract_wesoly_kopiec.csv", OPT);
   std::cout << "koniec extract" << std::endl;
 
   //testy podgladania :~ D, find_max
