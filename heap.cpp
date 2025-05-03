@@ -80,9 +80,17 @@ void Heap::increase_key(const char* val, int i) {
 }
 
 void Heap::modify_key(const char* val, int k) {
-  Pair* zmieniany = find(val);
-  if(zmieniany != nullptr)
-    zmieniany->set_key(k);
+  for (size_t i = 0; i < size(); ++i) {
+    if (strcmp(dane[i].get_val(), val) == 0) {
+      int stary_klucz = dane[i].get_key();
+      dane[i].set_key(k);
+      if (k > stary_klucz) //nowy wiekszy, wiec trzeba go przesunac w gore
+        heapify_up(i);
+      else
+        heapify_down(i);
+      return;
+    }
+  }
 }
 
 void Heap::build(DynamicArray& tablica) {

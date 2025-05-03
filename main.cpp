@@ -1,3 +1,8 @@
+/* WAŻNE
+   1) ogarniecie tablicy bo od tego zalezy np co bierzemy w pes/opt testach
+
+ */
+
 #include <iostream>
 #include <algorithm>
 #include <fstream>
@@ -35,7 +40,7 @@ std::unique_ptr<PriorityQueueStrategy> strategia(int i) {
     return std::make_unique<ListStrategy>();
     break;
   case 2:
-    return std::make_unique<DescendArrayStrategy>();
+    return std::make_unique<AscendArrayStrategy>(); //DESCEND ARRAY JEST KURWA ZROBIONE JAKO ASCEND AAAAAAAAAA
   }
   return nullptr; // lepiej wyjatek aleee juz tak niech bedzie
 }
@@ -44,53 +49,70 @@ int main() {
   //testy insert
   int ziarno = 2010370;
   Pair dane[N_TESTU];
-  double insertAVG[3][N_TESTU]; //heap, list, array
-  double insertOPT[3][N_TESTU]; //heap, list, array
-  double insertPES[3][N_TESTU]; //heap, list, array
-
-
-  double extractAVG[3][N_TESTU]; //heap, list, array
-  double extractOPT[3][N_TESTU]; //heap, list, array
-  double extractPES[3][N_TESTU]; //heap, list, array
-
-
+  double AVG[3][N_TESTU]; //heap, list, array
+  double OPT[3][N_TESTU]; //heap, list, array
+  double PES[3][N_TESTU]; //heap, list, array
+  
   //testy insert
   // pesymistyczny dla listy, tablicy to dodawanie ciagle najmniejszego -- daje na koniec sam (dane posortowane od najw. do najm.)
   // pesymistyczny dla kopca to dodawania ciagle najwiekszego -- musi caaaaaaly kopiec przekopac (dane posortowane od najm. do najw.)
   // optymistyczne z kolei na odwrot
+
+  // ZALEŻY JAKIEGO OSTATECZNIE UZYWAMY Z TABLICA
   for(int i = 0; i < 3; ++i) {
     generujDane(dane, N_TESTU, ziarno, 'a', 'z');
-    test_insert(strategia(i), dane, insertAVG[i], N_TESTU);
+    test_insert(strategia(i), dane, AVG[i], N_TESTU);
     
     std::sort(dane, dane+N_TESTU, [](Pair a, Pair b) { return a > b; }); //od najw do najm
-    test_insert(strategia(i), dane, (i == 0 ? insertOPT[i] : insertPES[i]), N_TESTU);
+    test_insert(strategia(i), dane, (i == 0 ? OPT[i] : PES[i]), N_TESTU);
     
     std::sort(dane, dane+N_TESTU, [](Pair a, Pair b) { return a < b; }); //od najm do najw
-    test_insert(strategia(i), dane, (i == 0 ? insertPES[i] : insertOPT[i]), N_TESTU);
+    test_insert(strategia(i), dane, (i == 0 ? PES[i] : OPT[i]), N_TESTU);
   }
 
-  zapisz("pomiary/insert_srednie.csv", insertAVG);
-  zapisz("pomiary/insert_optymistyczne.csv", insertOPT);
-  zapisz("pomiary/insert_pesymistyczne.csv", insertPES);
-
+  zapisz("pomiary/insert_srednie.csv", AVG);
+  zapisz("pomiary/insert_optymistyczne.csv", OPT);
+  zapisz("pomiary/insert_pesymistyczne.csv", PES);
+  std::cout << "koniec insert" << std::endl;
 
   //testy sciagania (extract_max)
-  // pesymistycznie
-  // pesymistycznie
-  // pesymistycznie
+  // pesymistycznie ani optymistycznie dla listy i tablicy sie nie da, bo i tak zawsze element sciagany jest pierwszy O(1)
+  // pesymistycznie dla kopca oznacza tyle, że jak juz ostatni da na pierwszy i usunie ostatni to wtedy musi ten ostatni na sam
+  // koniec przepchac, optymistycznie to musi jak najmniej przepchac
+
+  //ogolnie nie wiem czy zrobimy bo ciezka sprawa i chyba bez sensu nawet to robic lol
   for(int i = 0; i < 3; ++i) {
     generujDane(dane, N_TESTU, ziarno, 'a', 'z');
-    test_insert(strategia(i), dane, extractAVG[i], N_TESTU);
-    
-    std::sort(dane, dane+N_TESTU, [](Pair a, Pair b) { return a > b; }); //od najw do najm
-    test_insert(strategia(i), dane, (i == 0 ? extractOPT[i] : extractPES[i]), N_TESTU);
-    
-    std::sort(dane, dane+N_TESTU, [](Pair a, Pair b) { return a < b; }); //od najm do najw
-    test_insert(strategia(i), dane, (i == 0 ? extractPES[i] : extractOPT[i]), N_TESTU);
+    test_extract(strategia(i), dane, AVG[i], N_TESTU);
   }
 
-  zapisz("pomiary/extract_srednie.csv", extractAVG);
-  zapisz("pomiary/extract_optymistyczne.csv", extractOPT);
-  zapisz("pomiary/extract_pesymistyczne.csv", extractPES);
+  zapisz("pomiary/extract_srednie.csv", AVG);
+  std::cout << "koniec extract" << std::endl;
+
+  //testy podgladania :~ D, find_max
+  // wszystko w czasie O(1), zawsze
+  for(int i = 0; i < 3; ++i) {
+    generujDane(dane, N_TESTU, ziarno, 'a', 'z');
+    test_find_max(strategia(i), dane, AVG[i], N_TESTU);
+  }
+
+  zapisz("pomiary/find_max_srednie.csv", AVG);
+  std::cout << "koniec finda" << std::endl;
+
+  //testy modyfikacji, modify_key
+  // optymistycznie to jak za duzo nie trzeba zmieniac -- tutaj po prostu zwiekszenie klucza juz i tak najwiekszemu
+  // pesymistcznie to jak duzo trzeba zmieniac -- tutaj zmiana największemu (find_max) na nowy najmniejszy
+  // srednio to obojetnie ktoremu na costam sie zmienia
+  for(int i = 0; i < 3; ++i) {
+    generujDane(dane, N_TESTU, ziarno, 'a', 'z');
+    test_modify_average(strategia(i), AVG[i], N_TESTU);
+    test_modify_pessimistic(strategia(i), PES[i], N_TESTU);
+    test_modify_optimistic(strategia(i), OPT[i], N_TESTU);
+  }
+
+  zapisz("pomiary/modify_srednie.csv", AVG);
+  zapisz("pomiary/modify_pesymistyczne.csv", PES);
+  zapisz("pomiary/modify_optymistyczne.csv", OPT);
+  std::cout << "koniec modify" << std::endl;
   return 0;
 }
