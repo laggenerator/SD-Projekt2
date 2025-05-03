@@ -40,7 +40,7 @@ std::unique_ptr<PriorityQueueStrategy> strategia(int i) {
     return std::make_unique<ListStrategy>();
     break;
   case 2:
-    return std::make_unique<AscendArrayStrategy>(); //DESCEND ARRAY JEST KURWA ZROBIONE JAKO ASCEND AAAAAAAAAA
+    return std::make_unique<DescendArrayStrategy>();
   }
   return nullptr; // lepiej wyjatek aleee juz tak niech bedzie
 }
@@ -114,5 +114,16 @@ int main() {
   zapisz("pomiary/modify_pesymistyczne.csv", PES);
   zapisz("pomiary/modify_optymistyczne.csv", OPT);
   std::cout << "koniec modify" << std::endl;
+
+  //testy size
+  // jeden przypadek, bo to jest przetrzymywane w zmiennej
+  for(int i = 0; i < 3; ++i) {
+    generujDane(dane, N_TESTU, ziarno, 'a', 'z');
+    test_size(strategia(i), dane, AVG[i], N_TESTU);
+  }
+
+  zapisz("pomiary/size.csv", AVG);
+  std::cout << "koniec size" << std::endl;
+
   return 0;
 }

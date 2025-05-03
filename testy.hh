@@ -35,7 +35,7 @@ void test_insert(std::unique_ptr<PriorityQueueStrategy> st, Pair* dane, double* 
       auto start = std::chrono::high_resolution_clock::now();
       kolejka.insert(dane[i]); 
       auto end = std::chrono::high_resolution_clock::now();
-      std::chrono::duration<double, std::milli> czas = end - start;
+      std::chrono::duration<double, std::micro> czas = end - start;
       czasy[i] += czas.count();
     }
     for(size_t i = 0; i < roz; ++i) { //posprzatanie całej
@@ -62,7 +62,7 @@ void test_extract(std::unique_ptr<PriorityQueueStrategy> st, Pair* dane, double*
       auto start = std::chrono::high_resolution_clock::now();
       kolejka.extract_max();
       auto end = std::chrono::high_resolution_clock::now();
-      std::chrono::duration<double, std::milli> czas = end - start;
+      std::chrono::duration<double, std::micro> czas = end - start;
       czasy[roz-(i+1)] += czas.count(); //zapisuje na dobrej pozycji w tabeli (bo pelna kolejke oprozniamy)
     }
   }
@@ -84,7 +84,7 @@ void test_find_max(std::unique_ptr<PriorityQueueStrategy> st, Pair* dane, double
       auto start = std::chrono::high_resolution_clock::now();
       kolejka.find_max();
       auto end = std::chrono::high_resolution_clock::now();
-      std::chrono::duration<double, std::milli> czas = end - start;
+      std::chrono::duration<double, std::micro> czas = end - start;
       czasy[i] += czas.count();
     }
     for(size_t i = 0; i < roz; ++i)
@@ -142,7 +142,7 @@ void test_modify_average(std::unique_ptr<PriorityQueueStrategy> st, double* czas
       auto start = std::chrono::high_resolution_clock::now();
       kolejka.modify_key(val, nowy_klucz);
       auto end = std::chrono::high_resolution_clock::now();
-      std::chrono::duration<double, std::milli> czas = end - start;
+      std::chrono::duration<double, std::micro> czas = end - start;
       czasy[i] += czas.count();
     }
     for(size_t i = 0; i < roz; ++i) {
@@ -180,7 +180,7 @@ void test_modify_pessimistic(std::unique_ptr<PriorityQueueStrategy> st, double* 
       auto start = std::chrono::high_resolution_clock::now();
       kolejka.modify_key(wartosc, roz+i);
       auto end = std::chrono::high_resolution_clock::now();
-      std::chrono::duration<double, std::milli> czas = end - start;
+      std::chrono::duration<double, std::micro> czas = end - start;
       czasy[i] += czas.count();
     }
     for(size_t i = 0; i < roz; ++i) {
@@ -213,7 +213,7 @@ void test_modify_optimistic(std::unique_ptr<PriorityQueueStrategy> st, double* c
       auto start = std::chrono::high_resolution_clock::now();
       kolejka.modify_key(val, roz+i);
       auto end = std::chrono::high_resolution_clock::now();
-      std::chrono::duration<double, std::milli> czas = end - start;
+      std::chrono::duration<double, std::micro> czas = end - start;
       czasy[i] += czas.count();
     }
     for(size_t i = 0; i < roz; ++i) {
@@ -224,5 +224,30 @@ void test_modify_optimistic(std::unique_ptr<PriorityQueueStrategy> st, double* c
     czasy[i] /= SREDNIA;
   }
 }
+
+void test_size(std::unique_ptr<PriorityQueueStrategy> st, Pair* dane, double* czasy, const size_t roz) {
+  for (size_t i = 0; i < roz; ++i)
+    czasy[i] = 0.0;
+  
+  Prique kolejka(st);
+  for(size_t s = 0; s < SREDNIA; ++s) {
+    for(size_t i = 0; i < roz; ++i) { //dodajemy, wywoluje size, mierzy czas i tak 0 do rozmiar, potem zeruje kolejke
+      kolejka.insert(dane[i]);
+      
+      auto start = std::chrono::high_resolution_clock::now();
+      kolejka.size();
+      auto end = std::chrono::high_resolution_clock::now();
+      std::chrono::duration<double, std::micro> czas = end - start;
+      czasy[i] += czas.count();
+    }
+    for(size_t i = 0; i < roz; ++i)
+      kolejka.extract_max(); //wyczyszczenie kolejki
+  }
+  for(size_t i = 0; i < roz; ++i) {
+    czasy[i] /= SREDNIA;
+  }
+}
+
+
 
 #endif
