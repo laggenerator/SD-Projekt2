@@ -6,10 +6,12 @@
 #include <iostream>
 #include <algorithm>
 #include <fstream>
+#include <cmath>
 #include "prique.hh"
 #include "testy.hh"
 
-#define N_TESTU 1000 //od 0 do 999 elementow : ) - potem sie zrobi to do 50 kafli imo znowu
+#define N_TESTU 5000 //od 0 do 999 elementow : ) - potem sie zrobi to do 50 kafli imo znowu
+#define N_ZAPIS 50 //co ile zapisywac do pliku
 
 void zapisz(const char* nazwa_pliku, double dane[3][N_TESTU]) {
   //zapis do pliku
@@ -19,9 +21,8 @@ void zapisz(const char* nazwa_pliku, double dane[3][N_TESTU]) {
     std::cerr << "Nie można otworzyć pliku: " << nazwa_pliku << std::endl;
   }
   plik << "rozmiar;kopiec;lista;tablica" << std::endl;
-  
   //ogolnie pierwsza kolumna to po prostu i, ale np w usuwaniu to musi byc i+1, w insert juz i
-  for(size_t i = 0; i < N_TESTU; ++i) {
+  for(size_t i = 1; i < N_TESTU; i+=N_ZAPIS) {
     plik << i;
     for(size_t j = 0; j < 3; ++j) {
       plik << ";" << dane[j][i];
@@ -34,13 +35,13 @@ void zapisz(const char* nazwa_pliku, double dane[3][N_TESTU]) {
 std::unique_ptr<PriorityQueueStrategy> strategia(int i) {
   switch(i) {
   case 0:
-    return std::make_unique<HeapStrategy>();
+    return std::make_unique<HeapStrategy>(); //kopcowo
     break;
   case 1:
-    return std::make_unique<ListStrategy>();
+    return std::make_unique<ListStrategy>(); //od najwiekszego do najmniejszego
     break;
   case 2:
-    return std::make_unique<DescendArrayStrategy>();
+    return std::make_unique<DescendArrayStrategy>(); //od najwiekszego do najmniejszego
   }
   return nullptr; // lepiej wyjatek aleee juz tak niech bedzie
 }
@@ -54,20 +55,17 @@ int main() {
   double PES[3][N_TESTU]; //heap, list, array
   
   //testy insert
-  // pesymistyczny dla listy, tablicy to dodawanie ciagle najmniejszego -- daje na koniec sam (dane posortowane od najw. do najm.)
+  // pesymistyczny dla listy to dodawanie ciagle najmniejszego -- daje na koniec sam (dane posortowane od najw. do najm.)
+  // dla tablicy pesymistyczny to jak musi dodać na początek, bo przenosi wszystko (czyli dane posortowane od najm. do najw) 
   // pesymistyczny dla kopca to dodawania ciagle najwiekszego -- musi caaaaaaly kopiec przekopac (dane posortowane od najm. do najw.)
   // optymistyczne z kolei na odwrot
-
-  // ZALEŻY JAKIEGO OSTATECZNIE UZYWAMY Z TABLICA
   for(int i = 0; i < 3; ++i) {
     generujDane(dane, N_TESTU, ziarno, 'a', 'z');
     test_insert(strategia(i), dane, AVG[i], N_TESTU);
-    
     std::sort(dane, dane+N_TESTU, [](Pair a, Pair b) { return a > b; }); //od najw do najm
-    test_insert(strategia(i), dane, (i == 0 ? OPT[i] : PES[i]), N_TESTU);
-    
+    test_insert(strategia(i), dane, (i == 1 ? PES[i] : OPT[i]), N_TESTU);
     std::sort(dane, dane+N_TESTU, [](Pair a, Pair b) { return a < b; }); //od najm do najw
-    test_insert(strategia(i), dane, (i == 0 ? PES[i] : OPT[i]), N_TESTU);
+    test_insert(strategia(i), dane, (i == 1 ? OPT[i] : PES[i]), N_TESTU);
   }
 
   zapisz("pomiary/insert_srednie.csv", AVG);

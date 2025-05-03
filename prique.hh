@@ -127,7 +127,7 @@ class DescendArrayStrategy : public PriorityQueueStrategy {
 
       while(l < p){
         size_t mid = l + (p - l)/2;
-        if(dane.at_position(mid).get_key() <= klucz){
+        if(dane.at_position(mid).get_key() >= klucz){
           l = mid + 1;
         } else {
           p = mid;
